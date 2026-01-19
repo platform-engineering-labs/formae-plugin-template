@@ -1,0 +1,13 @@
+amends "pkl:Project"
+
+package {
+  name = "example"
+  baseUri = "package://your-registry.example.com/formae-plugin-example/schema/pkl/example"
+  version = "0.1.0"
+}
+
+dependencies {
+  ["formae"] {
+    uri = "package://hub.platform.engineering/plugins/pkl/schema/pkl/formae/formae@0.76.0"
+  }
+}
