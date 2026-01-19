@@ -4,8 +4,8 @@
 
 package main
 
-import "github.com/platform-engineering-labs/formae/pkg/plugin"
+import "github.com/platform-engineering-labs/formae/pkg/plugin/sdk"
 
 func main() {
-	plugin.Run(&Plugin{})
+	sdk.RunWithManifest(&Plugin{}, sdk.RunConfig{})
 }

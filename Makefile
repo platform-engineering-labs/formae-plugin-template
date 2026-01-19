@@ -1,27 +1,28 @@
 # Formae Plugin Makefile
 #
 # Targets:
-#   build          - Build the plugin binary
-#   test           - Run tests
-#   lint           - Run linter
-#   clean          - Remove build artifacts
-#   install        - Build and install plugin + schemas locally
-#   install-schema - Install Pkl schemas for CLI discovery
+#   build   - Build the plugin binary
+#   test    - Run tests
+#   lint    - Run linter
+#   clean   - Remove build artifacts
+#   install - Build and install plugin locally (binary + schema + manifest)
 
 # Plugin metadata - extracted from formae-plugin.pkl
 PLUGIN_NAME := $(shell pkl eval -x 'name' formae-plugin.pkl 2>/dev/null || echo "example")
 PLUGIN_VERSION := $(shell pkl eval -x 'version' formae-plugin.pkl 2>/dev/null || echo "0.0.0")
+PLUGIN_NAMESPACE := $(shell pkl eval -x 'spec.namespace' formae-plugin.pkl 2>/dev/null || echo "EXAMPLE")
 
 # Build settings
 GO := go
 GOFLAGS := -trimpath
-BINARY := formae-plugin-$(PLUGIN_NAME)
+BINARY := $(PLUGIN_NAME)
 
 # Installation paths
-PLUGIN_DIR := $(HOME)/.pel/formae/plugins
-SCHEMA_DIR := $(PLUGIN_DIR)/$(PLUGIN_NAME)/$(PLUGIN_VERSION)/schema/pkl
+# NOTE: Directory structure will change from <namespace> to <name> in a future version
+PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
+INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)/v$(PLUGIN_VERSION)
 
-.PHONY: all build test lint clean install install-schema help
+.PHONY: all build test lint clean install help
 
 all: build
 
@@ -45,17 +46,18 @@ lint:
 clean:
 	rm -rf bin/ dist/
 
-## install-schema: Install Pkl schemas for CLI discovery
-install-schema:
-	@mkdir -p $(SCHEMA_DIR)
-	@cp -r schema/pkl/* $(SCHEMA_DIR)/
-	@echo "Installed schemas to $(SCHEMA_DIR)"
-
-## install: Build and install plugin locally (binary + schemas)
-install: build install-schema
-	@mkdir -p $(PLUGIN_DIR)
-	@cp bin/$(BINARY) $(PLUGIN_DIR)/$(PLUGIN_NAME)@$(PLUGIN_VERSION).so
-	@echo "Installed $(PLUGIN_NAME)@$(PLUGIN_VERSION) to $(PLUGIN_DIR)"
+## install: Build and install plugin locally (binary + schema + manifest)
+## Installs to ~/.pel/formae/plugins/<namespace>/v<version>/
+install: build
+	@echo "Installing $(PLUGIN_NAME) v$(PLUGIN_VERSION) (namespace: $(PLUGIN_NAMESPACE))..."
+	@mkdir -p $(INSTALL_DIR)/schema/pkl
+	@cp bin/$(BINARY) $(INSTALL_DIR)/$(BINARY)
+	@cp -r schema/pkl/* $(INSTALL_DIR)/schema/pkl/
+	@cp formae-plugin.pkl $(INSTALL_DIR)/
+	@echo "Installed to $(INSTALL_DIR)"
+	@echo "  - Binary: $(INSTALL_DIR)/$(BINARY)"
+	@echo "  - Schema: $(INSTALL_DIR)/schema/pkl/"
+	@echo "  - Manifest: $(INSTALL_DIR)/formae-plugin.pkl"
 
 ## help: Show this help message
 help:
