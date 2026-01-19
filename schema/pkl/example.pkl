@@ -1,0 +1,67 @@
+/*
+ * Example Formae Plugin Schema
+ *
+ * This file defines the resource types your plugin supports.
+ * Each resource class extends formae.Resource and includes
+ * a ResourceHint annotation with metadata.
+ *
+ * See the AWS plugin for comprehensive examples:
+ * https://github.com/platform-engineering-labs/formae/tree/main/plugins/aws/schema/pkl
+ */
+module example
+
+import "@formae/formae.pkl"
+
+/// ExampleResource demonstrates the structure of a Formae resource.
+/// TODO: Replace with your actual resource definitions.
+@formae.ResourceHint {
+    // Resource type in format: NAMESPACE::SERVICE::RESOURCE
+    type = "EXAMPLE::Service::Resource"
+
+    // JSONPath to the resource's unique identifier in the API response
+    identifier = "$.Id"
+
+    // Optional: Parent resource type for nested resources
+    // parent = "EXAMPLE::Service::ParentResource"
+
+    // Optional: Set to true if resource cannot be provisioned via API
+    // nonprovisionable = false
+
+    // Optional: Set to false to exclude from discovery
+    // discoverable = true
+
+    // Optional: Set to false to exclude from extraction
+    // extractable = true
+}
+class ExampleResource extends formae.Resource {
+    // The 'type' is set from the ResourceHint annotation
+    fixed hidden type: String = "EXAMPLE::Service::Resource"
+
+    // Define your resource properties below
+    // Use @formae.FieldHint annotations for special handling
+
+    /// The display name of the resource
+    @formae.FieldHint {}
+    name: String
+
+    /// Optional description
+    @formae.FieldHint {}
+    description: String?
+
+    /// Example of a create-only property (cannot be changed after creation)
+    @formae.FieldHint { createOnly = true }
+    immutableSetting: String?
+
+    /// Example of a nested configuration
+    @formae.FieldHint {}
+    config: ResourceConfig?
+}
+
+/// Nested configuration class
+class ResourceConfig extends formae.SubResource {
+    @formae.FieldHint {}
+    enabled: Boolean = true
+
+    @formae.FieldHint {}
+    maxItems: Int = 100
+}
