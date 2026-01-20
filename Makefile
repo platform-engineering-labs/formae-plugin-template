@@ -22,7 +22,7 @@ BINARY := $(PLUGIN_NAME)
 PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
 INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)/v$(PLUGIN_VERSION)
 
-.PHONY: all build test lint clean install help
+.PHONY: all build test lint clean install help conformance-test
 
 all: build
 
@@ -63,3 +63,9 @@ install: build
 help:
 	@echo "Available targets:"
 	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## /  /'
+
+## conformance-test: Run conformance tests against formae
+## Usage: make conformance-test [VERSION=0.76.0]
+## Downloads the specified formae version (or latest) and runs conformance tests.
+conformance-test: install
+	@./scripts/run-conformance-tests.sh $(VERSION)
