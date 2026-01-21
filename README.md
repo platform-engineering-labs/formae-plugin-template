@@ -23,11 +23,15 @@ Template repository for creating Formae resource plugins.
 ├── formae-plugin.pkl      # Plugin manifest (name, version, namespace)
 ├── plugin.go              # Your ResourcePlugin implementation
 ├── main.go                # Entry point (don't modify)
-├── plugin_test.go         # Tests
 ├── schema/pkl/            # Pkl resource schemas
 │   ├── PklProject
 │   └── example.pkl
 ├── examples/              # Usage examples
+├── scripts/
+│   ├── ci/                # CI hook scripts
+│   │   ├── setup-credentials.sh
+│   │   └── clean-environment.sh
+│   └── run-conformance-tests.sh
 ├── go.mod
 ├── Makefile
 └── README.md
@@ -70,7 +74,7 @@ func (p *Plugin) List(ctx, req) (*ListResult, error) { ... }
 
 ```bash
 make build      # Build plugin binary
-make test       # Run tests
+make test       # Run unit tests
 make lint       # Run linter (requires golangci-lint)
 make install    # Build + install locally for testing
 ```
@@ -87,6 +91,61 @@ formae agent start
 # Apply example resources
 formae apply examples/basic/main.pkl
 ```
+
+### Conformance Testing
+
+Run the full conformance test suite (CRUD lifecycle + discovery) against a specific formae version:
+
+```bash
+# Run conformance tests with latest stable version
+make conformance-test
+
+# Run conformance tests with a specific version
+make conformance-test VERSION=0.77.0
+```
+
+The conformance tests:
+1. Call `setup-credentials` to provision cloud credentials
+2. Call `clean-environment` to remove orphaned resources from previous runs
+3. Build and install the plugin locally
+4. Download the specified formae version (defaults to latest)
+5. Run CRUD lifecycle tests for each resource type
+6. Run discovery tests to verify resource detection
+7. Call `clean-environment` to clean up test resources
+
+### CI Hooks
+
+The template includes hook scripts that you customize for your cloud provider:
+
+#### `scripts/ci/setup-credentials.sh`
+
+Provisions credentials for your cloud provider. Called before running conformance tests.
+
+**Examples:**
+- AWS: Verify `AWS_ACCESS_KEY_ID` is set or use OIDC
+- OpenStack: Source your RC file and verify required env vars
+- Azure: Run `az login` or verify OIDC credentials
+- GCP: Run `gcloud auth` or verify workload identity
+
+#### `scripts/ci/clean-environment.sh`
+
+Cleans up test resources in your cloud environment. Called before AND after conformance tests to:
+- Remove orphaned resources from previous failed runs (pre-cleanup)
+- Clean up resources created during the test run (post-cleanup)
+
+The script should be idempotent and delete all resources matching your test prefix
+(e.g., `formae-plugin-sdk-test-*`).
+
+#### GitHub Actions
+
+The `.github/workflows/ci.yml` workflow includes a `conformance-tests` job that is
+disabled by default. To enable it:
+
+1. Configure credentials for your cloud provider in the workflow
+2. Implement the hook scripts for local verification
+3. Set `run_conformance` to `true` when triggering the workflow, or modify the `if` condition
+
+See the workflow file for credential configuration examples for AWS, Azure, GCP, and OpenStack.
 
 ## Defining Resources (Pkl)
 
@@ -157,4 +216,13 @@ func (p *Plugin) Status(ctx context.Context, req *resource.StatusRequest) (*reso
 
 ## License
 
-Apache 2.0 - See [LICENSE](LICENSE)
+This template is licensed under FSL-1.1-ALv2 - See [LICENSE](LICENSE)
+
+When creating your own plugin, choose an appropriate license for your project.
+Common choices include:
+- **MIT** - Most permissive
+- **Apache-2.0** - Permissive with patent grant (recommended)
+- **MPL-2.0** - Weak copyleft
+- **FSL-1.1-ALv2** - Functional Source License
+
+Replace the LICENSE file with your chosen license when you create your plugin.
