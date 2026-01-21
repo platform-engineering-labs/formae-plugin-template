@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: FSL-1.1-ALv2
 #
 # Script to run conformance tests against a specific version of formae.
-# Downloads the formae binary to a temporary directory and runs tests.
 #
 # Usage:
 #   ./scripts/run-conformance-tests.sh [VERSION]
@@ -12,6 +11,7 @@
 #   VERSION - Optional formae version (e.g., 0.76.0). Defaults to "latest".
 #
 # Environment variables:
+#   FORMAE_BINARY - Path to formae binary (skips download if set)
 #   FORMAE_INSTALL_PREFIX - Installation directory (default: temp directory)
 
 set -euo pipefail
@@ -20,45 +20,133 @@ VERSION="${1:-latest}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Create temp directory for formae binary
-if [[ -n "${FORMAE_INSTALL_PREFIX:-}" ]]; then
-    INSTALL_DIR="${FORMAE_INSTALL_PREFIX}"
-    mkdir -p "${INSTALL_DIR}"
-    echo "Using specified install directory: ${INSTALL_DIR}"
+# =============================================================================
+# Setup Formae Binary
+# =============================================================================
+
+# Check if FORMAE_BINARY is already set and valid
+if [[ -n "${FORMAE_BINARY:-}" ]] && [[ -x "${FORMAE_BINARY}" ]]; then
+    echo "Using FORMAE_BINARY from environment: ${FORMAE_BINARY}"
+    # Extract version from binary if not explicitly provided
+    if [[ "${VERSION}" == "latest" ]]; then
+        VERSION=$("${FORMAE_BINARY}" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        if [[ -z "${VERSION}" ]]; then
+            echo "Warning: Could not extract version from FORMAE_BINARY, using 'latest'"
+            VERSION="latest"
+        else
+            echo "Detected formae version: ${VERSION}"
+        fi
+    fi
 else
+    # Always download formae to temp directory for conformance tests
+    # Don't use system-installed formae to ensure version consistency
+
     INSTALL_DIR=$(mktemp -d -t formae-conformance-XXXXXX)
     echo "Using temp directory: ${INSTALL_DIR}"
     trap "rm -rf ${INSTALL_DIR}" EXIT
+
+    # Determine OS and architecture
+    DETECTED_OS=$(uname | tr '[:upper:]' '[:lower:]')
+    DETECTED_ARCH=$(uname -m | tr -d '_')
+
+    # Resolve version if "latest"
+    if [[ "${VERSION}" == "latest" ]]; then
+        echo "Resolving latest version..."
+        VERSION=$(curl -s https://hub.platform.engineering/binaries/repo.json | \
+            jq -r "[.Packages[] | select(.Version | index(\"-\") | not) | select(.OsArch.OS == \"${DETECTED_OS}\" and .OsArch.Arch == \"${DETECTED_ARCH}\")][0].Version")
+        if [[ -z "${VERSION}" || "${VERSION}" == "null" ]]; then
+            echo "Error: Could not determine latest version for ${DETECTED_OS}-${DETECTED_ARCH}"
+            exit 1
+        fi
+    fi
+
+    echo "Downloading formae version ${VERSION}..."
+    PKGNAME="formae@${VERSION}_${DETECTED_OS}-${DETECTED_ARCH}.tgz"
+    DOWNLOAD_URL="https://hub.platform.engineering/binaries/pkgs/${PKGNAME}"
+
+    if ! curl -fsSL "${DOWNLOAD_URL}" -o "${INSTALL_DIR}/${PKGNAME}"; then
+        echo "Error: Failed to download ${DOWNLOAD_URL}"
+        exit 1
+    fi
+
+    # Extract to install directory
+    echo "Extracting..."
+    tar -xzf "${INSTALL_DIR}/${PKGNAME}" -C "${INSTALL_DIR}"
+
+    # Find the formae binary
+    FORMAE_BINARY="${INSTALL_DIR}/formae/bin/formae"
+    if [[ ! -x "${FORMAE_BINARY}" ]]; then
+        # Try alternative locations
+        if [[ -x "${INSTALL_DIR}/bin/formae" ]]; then
+            FORMAE_BINARY="${INSTALL_DIR}/bin/formae"
+        elif [[ -x "${INSTALL_DIR}/formae" ]]; then
+            FORMAE_BINARY="${INSTALL_DIR}/formae"
+        else
+            echo "Error: formae binary not found in ${INSTALL_DIR}"
+            find "${INSTALL_DIR}" -name "formae" -type f 2>/dev/null || ls -laR "${INSTALL_DIR}"
+            exit 1
+        fi
+    fi
 fi
 
-# Download formae binary
-echo "Downloading formae ${VERSION}..."
-if [[ "${VERSION}" == "latest" ]]; then
-    /bin/bash -c "$(curl -fsSL https://hub.platform.engineering/setup/formae.sh)" -- -y -p "${INSTALL_DIR}"
-else
-    /bin/bash -c "$(curl -fsSL https://hub.platform.engineering/setup/formae.sh)" -- -y -v "${VERSION}" -p "${INSTALL_DIR}"
+echo ""
+echo "Using formae binary: ${FORMAE_BINARY}"
+"${FORMAE_BINARY}" --version
+
+# Export FORMAE_BINARY and FORMAE_VERSION for the tests
+# FORMAE_VERSION is required by the plugin SDK to resolve PKL schema paths
+export FORMAE_BINARY
+export FORMAE_VERSION="${VERSION}"
+
+# =============================================================================
+# Update and Resolve PKL Dependencies
+# =============================================================================
+# Update testdata/PklProject with the resolved formae version, then resolve
+# dependencies from the public package registry.
+# =============================================================================
+
+echo ""
+echo "Updating PKL dependencies for formae version ${VERSION}..."
+
+# Update PklProject files with the resolved formae version
+if [[ "${VERSION}" != "latest" ]]; then
+    # Update schema/pkl/PklProject (plugin schema depends on formae)
+    if [[ -f "${PROJECT_ROOT}/schema/pkl/PklProject" ]]; then
+        echo "Updating schema/pkl/PklProject to use formae@${VERSION}..."
+        sed -i "s|formae/formae@[0-9.]*\"|formae/formae@${VERSION}\"|g" "${PROJECT_ROOT}/schema/pkl/PklProject"
+    fi
+
+    # Update testdata/PklProject (test files depend on formae)
+    if [[ -f "${PROJECT_ROOT}/testdata/PklProject" ]]; then
+        echo "Updating testdata/PklProject to use formae@${VERSION}..."
+        sed -i "s|formae/formae@[0-9.]*\"|formae/formae@${VERSION}\"|g" "${PROJECT_ROOT}/testdata/PklProject"
+    fi
 fi
 
-# Find the formae binary (setup.sh installs to ${INSTALL_DIR}/formae/bin/formae)
-FORMAE_BINARY="${INSTALL_DIR}/formae/bin/formae"
-if [[ ! -x "${FORMAE_BINARY}" ]]; then
-    # Fallback: check root directory
-    if [[ -x "${INSTALL_DIR}/formae" ]]; then
-        FORMAE_BINARY="${INSTALL_DIR}/formae"
-    else
-        echo "Error: formae binary not found in ${INSTALL_DIR}"
-        ls -laR "${INSTALL_DIR}" 2>/dev/null || ls -la "${INSTALL_DIR}"
+# Resolve schema dependencies (if any)
+if [[ -f "${PROJECT_ROOT}/schema/pkl/PklProject" ]]; then
+    echo "Resolving schema/pkl dependencies..."
+    if ! pkl project resolve "${PROJECT_ROOT}/schema/pkl" 2>&1; then
+        echo "Error: Failed to resolve schema/pkl dependencies"
+        echo "Make sure the formae PKL package is accessible at the configured URL"
         exit 1
     fi
 fi
 
-echo "Using formae binary: ${FORMAE_BINARY}"
-"${FORMAE_BINARY}" version
+# Resolve testdata dependencies
+if [[ -f "${PROJECT_ROOT}/testdata/PklProject" ]]; then
+    echo "Resolving testdata dependencies..."
+    if ! pkl project resolve "${PROJECT_ROOT}/testdata" 2>&1; then
+        echo "Error: Failed to resolve testdata dependencies"
+        exit 1
+    fi
+fi
 
-# Export FORMAE_BINARY for the tests
-export FORMAE_BINARY
+echo "PKL dependencies resolved successfully"
 
-# Run conformance tests
+# =============================================================================
+# Run Conformance Tests
+# =============================================================================
 echo ""
 echo "Running conformance tests..."
 cd "${PROJECT_ROOT}"

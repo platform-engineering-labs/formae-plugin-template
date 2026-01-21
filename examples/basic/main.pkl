@@ -2,50 +2,37 @@
  * Basic Example
  *
  * This example shows how to define resources using your plugin.
- * Run with: formae eval examples/basic/main.pkl
+ * Run with: formae apply examples/basic/main.pkl
  */
-amends "@formae/formae.pkl"
+amends "@formae/forma.pkl"
 
+import "@formae/formae.pkl"
 import "@example/example.pkl"
 
-// Define a target for your provider
-// The target configuration varies by provider
-local exampleTarget = new formae.Target {
-    label = "my-target"
-    namespace = "EXAMPLE"
-    config = new {
-        // Add your provider-specific configuration here
-        // e.g., region, credentials path, etc.
-        region = "us-east-1"
-    }
-}
-
-// Define a stack to group resources
-local defaultStack = new formae.Stack {
+forma {
+  new formae.Stack {
     label = "default"
     description = "Default stack for example resources"
-}
+  }
 
-// Create an example resource
-local myResource = new example.ExampleResource {
+  new formae.Target {
+    label = "my-target"
+    namespace = "EXAMPLE"
+    // Add your provider-specific configuration here
+    // For typed config, create a Config class in your schema:
+    //   config = new example.Config { region = "us-east-1" }
+    config = new Mapping {
+      ["region"] = "us-east-1"
+    }
+  }
+
+  new example.ExampleResource {
     label = "my-resource"
-    target = exampleTarget.res
-    stack = defaultStack.res
-
     name = "My Example Resource"
     description = "This is an example resource"
-    config = new {
-        enabled = true
-        maxItems = 50
+    config = new example.ResourceConfig {
+      enabled = true
+      maxItems = 50
     }
-}
-
-// Render the forma
-output {
-    value = new formae.FormaRender {
-        Stacks { defaultStack }
-        Targets { exampleTarget }
-        Resources { myResource }
-        Resolvables {}
-    }
+  }
 }
