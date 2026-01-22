@@ -139,6 +139,9 @@ jobs:
 
       # =================================================================
 
+      - name: Install plugin
+        run: make install
+
       - name: Run conformance tests
         env:
           FORMAE_TEST_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
