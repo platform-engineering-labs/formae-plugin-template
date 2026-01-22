@@ -1,6 +1,6 @@
 # Formae Plugin Template
 
-Template repository for creating Formae resource plugins.
+Template repository for creating formae resource plugins.
 
 > **Note:** Don't use GitHub's "Use this template" button. Instead, use the Formae CLI
 > which will prompt for your plugin details and set everything up correctly:
@@ -133,8 +133,7 @@ Cleans up test resources in your cloud environment. Called before AND after conf
 - Remove orphaned resources from previous failed runs (pre-cleanup)
 - Clean up resources created during the test run (post-cleanup)
 
-The script should be idempotent and delete all resources matching your test prefix
-(e.g., `formae-plugin-sdk-test-*`).
+The script should be idempotent and delete all resources under the /testdata folder
 
 #### GitHub Actions
 
@@ -183,9 +182,11 @@ spec {
 }
 ```
 
-## Async Operations
+## Async (long-running) Operations
 
-For providers with async operations, return `InProgress` with a `RequestID`:
+All plugin operations return the `ProgressResult` struct. For async (long-running) operations
+return `InProgress` with a `RequestID`. The formae agent will call the `Status` method on
+a regular interval to request the status of the operation.
 
 ```go
 func (p *Plugin) Create(ctx context.Context, req *resource.CreateRequest) (*resource.CreateResult, error) {
