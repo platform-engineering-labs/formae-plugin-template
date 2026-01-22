@@ -16,6 +16,15 @@
 
 set -euo pipefail
 
+# Cross-platform sed in-place edit (macOS vs Linux)
+sed_inplace() {
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' "$@"
+    else
+        sed -i "$@"
+    fi
+}
+
 VERSION="${1:-latest}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -113,13 +122,13 @@ if [[ "${VERSION}" != "latest" ]]; then
     # Update schema/pkl/PklProject (plugin schema depends on formae)
     if [[ -f "${PROJECT_ROOT}/schema/pkl/PklProject" ]]; then
         echo "Updating schema/pkl/PklProject to use formae@${VERSION}..."
-        sed -i "s|formae/formae@[0-9.]*\"|formae/formae@${VERSION}\"|g" "${PROJECT_ROOT}/schema/pkl/PklProject"
+        sed_inplace "s|formae/formae@[0-9.]*\"|formae/formae@${VERSION}\"|g" "${PROJECT_ROOT}/schema/pkl/PklProject"
     fi
 
     # Update testdata/PklProject (test files depend on formae)
     if [[ -f "${PROJECT_ROOT}/testdata/PklProject" ]]; then
         echo "Updating testdata/PklProject to use formae@${VERSION}..."
-        sed -i "s|formae/formae@[0-9.]*\"|formae/formae@${VERSION}\"|g" "${PROJECT_ROOT}/testdata/PklProject"
+        sed_inplace "s|formae/formae@[0-9.]*\"|formae/formae@${VERSION}\"|g" "${PROJECT_ROOT}/testdata/PklProject"
     fi
 fi
 

@@ -4,7 +4,6 @@
  * This file defines metadata for your Formae plugin.
  * Update the values below to match your plugin.
  */
-amends "@formae/plugin-manifest.pkl"
 
 // TODO: Change to your plugin name (lowercase, letters/numbers/hyphens)
 name = "example"
@@ -12,39 +11,19 @@ name = "example"
 // TODO: Update version following semver
 version = "0.1.0"
 
+// TODO: Resource type namespace prefix (uppercase)
+// This appears in resource types: EXAMPLE::Service::Resource
+namespace = "EXAMPLE"
+
 // TODO: Describe what your plugin does
 description = "Example Formae plugin template"
 
-metadata {
-    // TODO: Your name or organization
-    author = "Your Name"
+// TODO: Your license (SPDX identifier)
+license = "Apache-2.0"
 
-    // TODO: Your license (SPDX identifier)
-    license = "Apache-2.0"
+// TODO: Minimum formae version required
+minFormaeVersion = "0.77.0"
 
-    // TODO: Your plugin repository URL
-    repository = "https://github.com/your-org/formae-plugin-example"
-}
-
-spec {
-    // Protocol version - do not change unless upgrading SDK
-    protocolVersion = 1
-
-    // TODO: Resource type namespace prefix (uppercase)
-    // This appears in resource types: EXAMPLE::Service::Resource
-    namespace = "EXAMPLE"
-
-    // Capabilities your plugin supports
-    // Remove any your plugin does not implement
-    capabilities {
-        "create"
-        "read"
-        "update"
-        "delete"
-        "list"
-        "discovery"
-    }
-
-    // Schema directory (default is fine for most plugins)
-    // schemaDir = "schema/pkl/"
+output {
+  renderer = new JsonRenderer {}
 }

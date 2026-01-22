@@ -10,7 +10,7 @@
 # Plugin metadata - extracted from formae-plugin.pkl
 PLUGIN_NAME := $(shell pkl eval -x 'name' formae-plugin.pkl 2>/dev/null || echo "example")
 PLUGIN_VERSION := $(shell pkl eval -x 'version' formae-plugin.pkl 2>/dev/null || echo "0.0.0")
-PLUGIN_NAMESPACE := $(shell pkl eval -x 'spec.namespace' formae-plugin.pkl 2>/dev/null || echo "EXAMPLE")
+PLUGIN_NAMESPACE := $(shell pkl eval -x 'namespace' formae-plugin.pkl 2>/dev/null || echo "EXAMPLE")
 
 # Build settings
 GO := go
@@ -22,7 +22,7 @@ BINARY := $(PLUGIN_NAME)
 PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
 INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)/v$(PLUGIN_VERSION)
 
-.PHONY: all build test lint clean install help setup-credentials clean-environment conformance-test
+.PHONY: all build test test-unit test-integration lint clean install help setup-credentials clean-environment conformance-test
 
 all: build
 
@@ -34,9 +34,14 @@ build:
 test:
 	$(GO) test -v ./...
 
-## test-unit: Run unit tests only
+## test-unit: Run unit tests only (tests with //go:build unit tag)
 test-unit:
 	$(GO) test -v -tags=unit ./...
+
+## test-integration: Run integration tests (requires cloud credentials)
+## Add tests with //go:build integration tag
+test-integration:
+	$(GO) test -v -tags=integration ./...
 
 ## lint: Run golangci-lint
 lint:
@@ -48,8 +53,10 @@ clean:
 
 ## install: Build and install plugin locally (binary + schema + manifest)
 ## Installs to ~/.pel/formae/plugins/<namespace>/v<version>/
+## Removes any existing versions of the plugin first to ensure clean state.
 install: build
 	@echo "Installing $(PLUGIN_NAME) v$(PLUGIN_VERSION) (namespace: $(PLUGIN_NAMESPACE))..."
+	@rm -rf $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)
 	@mkdir -p $(INSTALL_DIR)/schema/pkl
 	@cp bin/$(BINARY) $(INSTALL_DIR)/$(BINARY)
 	@cp -r schema/pkl/* $(INSTALL_DIR)/schema/pkl/
