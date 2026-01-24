@@ -22,7 +22,7 @@ description = "Example Formae plugin template"
 license = "Apache-2.0"
 
 // TODO: Minimum formae version required
-minFormaeVersion = "0.77.0"
+minFormaeVersion = "0.80.0"
 
 output {
   renderer = new JsonRenderer {}

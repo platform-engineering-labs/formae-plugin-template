@@ -1,12 +1,6 @@
-# Example Plugin for Formae
-
-<!-- TODO: Update with your plugin description -->
-Example Formae plugin template - replace this with a description of what your plugin manages.
-
-**License:** Apache-2.0
-**Min Formae Version:** 0.77.0
-
-<!-- TEMPLATE SETUP - Remove this entire section after completing setup ========
+<!-- ============================================================================
+     TEMPLATE CHECKLIST - Remove this entire block after completing setup
+     ============================================================================
 
 ## Getting Started
 
@@ -15,18 +9,23 @@ After creating your plugin with `formae plugin init`, complete these steps:
 - [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, description)
 - [ ] Define your resource types in `schema/pkl/*.pkl`
 - [ ] Implement CRUD operations in `plugin.go`
-- [ ] Update this README:
-  - [ ] Replace the title and description above
-  - [ ] Document your supported resources
-  - [ ] Add configuration examples
-  - [ ] Remove this "Getting Started" section
+- [ ] Update this README (see below - replace title, description, resources, etc.)
 - [ ] Set up local credentials for testing (see Development section)
 - [ ] Run conformance tests locally: `make conformance-test`
 - [ ] Configure CI credentials in `.github/workflows/ci.yml` (optional)
+- [ ] Remove this "Getting Started" checklist section
 
 For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io/plugin-sdk).
 
-======== END TEMPLATE SETUP -->
+     ============================================================================
+     END TEMPLATE CHECKLIST - Everything below is YOUR plugin's README
+     ============================================================================ -->
+
+# Example Plugin for Formae
+
+<!-- TODO: Update title and description for your plugin -->
+
+Example Formae plugin template - replace this with a description of what your plugin manages.
 
 ## Installation
 
@@ -70,7 +69,7 @@ See the [examples/](examples/) directory for usage examples.
 formae eval examples/basic/main.pkl
 
 # Apply resources
-formae apply examples/basic/main.pkl
+formae apply --mode reconcile --watch examples/basic/main.pkl
 ```
 
 ## Development
@@ -100,7 +99,7 @@ make install
 formae agent start
 
 # Apply example resources
-formae apply examples/basic/main.pkl
+formae apply --mode reconcile --watch examples/basic/main.pkl
 ```
 
 ### Credentials Setup
@@ -123,12 +122,11 @@ Run the full CRUD lifecycle + discovery tests:
 
 ```bash
 make conformance-test                  # Latest formae version
-make conformance-test VERSION=0.77.0   # Specific version
+make conformance-test VERSION=0.80.0   # Specific version
 ```
 
 The `scripts/ci/clean-environment.sh` script cleans up test resources. It runs before and after conformance tests and should be idempotent.
 
 ## License
 
-<!-- TODO: Update with your chosen license -->
-This plugin is licensed under Apache-2.0 - See [LICENSE](LICENSE)
+This plugin is licensed under [Apache-2.0](LICENSE). <!-- TODO: Update with your chosen license -->
