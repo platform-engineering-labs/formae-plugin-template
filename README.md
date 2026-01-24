@@ -31,9 +31,6 @@ Example Formae plugin template - replace this with a description of what your pl
 
 ```bash
 # Install the plugin
-formae plugin install <plugin-name>
-
-# Or build from source
 make install
 ```
 
