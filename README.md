@@ -1,67 +1,77 @@
-# Formae Plugin Template
+# Example Plugin for Formae
 
-Template repository for creating formae resource plugins.
+<!-- TODO: Update with your plugin description -->
+Example Formae plugin template - replace this with a description of what your plugin manages.
 
-> **Note:** Don't use GitHub's "Use this template" button. Instead, use the Formae CLI
-> which will prompt for your plugin details and set everything up correctly:
->
-> ```bash
-> formae plugin init my-plugin
-> ```
+**License:** Apache-2.0
+**Min Formae Version:** 0.77.0
 
-## Quick Start
+<!-- TEMPLATE SETUP - Remove this entire section after completing setup ========
 
-1. **Create plugin**: `formae plugin init <name>` (prompts for namespace, license, etc.)
-2. **Define resources** in `schema/pkl/*.pkl`
-3. **Implement CRUD operations** in `plugin.go`
-4. **Build and test**: `make build && make test`
+## Getting Started
 
-## Project Structure
+After creating your plugin with `formae plugin init`, complete these steps:
 
-```
-.
-├── formae-plugin.pkl      # Plugin manifest (name, version, namespace)
-├── plugin.go              # Your ResourcePlugin implementation
-├── main.go                # Entry point (don't modify)
-├── schema/pkl/            # Pkl resource schemas
-│   ├── PklProject
-│   └── example.pkl
-├── examples/              # Usage examples
-├── scripts/
-│   ├── ci/                # CI hook scripts
-│   │   ├── setup-credentials.sh
-│   │   └── clean-environment.sh
-│   └── run-conformance-tests.sh
-├── go.mod
-├── Makefile
-└── README.md
-```
+- [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, description)
+- [ ] Define your resource types in `schema/pkl/*.pkl`
+- [ ] Implement CRUD operations in `plugin.go`
+- [ ] Update this README:
+  - [ ] Replace the title and description above
+  - [ ] Document your supported resources
+  - [ ] Add configuration examples
+  - [ ] Remove this "Getting Started" section
+- [ ] Set up local credentials for testing (see Development section)
+- [ ] Run conformance tests locally: `make conformance-test`
+- [ ] Configure CI credentials in `.github/workflows/ci.yml` (optional)
 
-## What You Implement
+For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io/plugin-sdk).
 
-You only implement the `ResourcePlugin` interface in `plugin.go`:
+======== END TEMPLATE SETUP -->
 
-```go
-type Plugin struct{}
+## Installation
 
-// Configuration
-func (p *Plugin) RateLimit() plugin.RateLimitConfig { ... }
-func (p *Plugin) DiscoveryFilters() []plugin.MatchFilter { ... }
-func (p *Plugin) LabelConfig() plugin.LabelConfig { ... }
+```bash
+# Install the plugin
+formae plugin install <plugin-name>
 
-// CRUD Operations
-func (p *Plugin) Create(ctx, req) (*CreateResult, error) { ... }
-func (p *Plugin) Read(ctx, req) (*ReadResult, error) { ... }
-func (p *Plugin) Update(ctx, req) (*UpdateResult, error) { ... }
-func (p *Plugin) Delete(ctx, req) (*DeleteResult, error) { ... }
-func (p *Plugin) Status(ctx, req) (*StatusResult, error) { ... }
-func (p *Plugin) List(ctx, req) (*ListResult, error) { ... }
+# Or build from source
+make install
 ```
 
-**The SDK handles everything else:**
-- Plugin identity (name, version, namespace) → read from `formae-plugin.pkl`
-- Schema extraction → auto-discovered from `schema/pkl/`
-- Resource descriptors → generated from Pkl schemas
+## Supported Resources
+
+<!-- TODO: Document your supported resource types -->
+
+| Resource Type | Description |
+|---------------|-------------|
+| `EXAMPLE::Service::Resource` | Example resource (replace with your actual resources) |
+
+## Configuration
+
+Configure a target in your Forma file:
+
+```pkl
+new formae.Target {
+    label = "my-target"
+    namespace = "EXAMPLE"  // TODO: Update with your namespace
+    config = new Mapping {
+        ["region"] = "us-east-1"
+        // TODO: Add your provider-specific configuration
+    }
+}
+```
+
+## Examples
+
+See the [examples/](examples/) directory for usage examples.
+
+```bash
+# Evaluate an example
+formae eval examples/basic/main.pkl
+
+# Apply resources
+formae apply examples/basic/main.pkl
+```
 
 ## Development
 
@@ -69,161 +79,56 @@ func (p *Plugin) List(ctx, req) (*ListResult, error) { ... }
 
 - Go 1.25+
 - [Pkl CLI](https://pkl-lang.org/main/current/pkl-cli/index.html)
+- Cloud provider credentials (for conformance testing)
 
 ### Building
 
 ```bash
 make build      # Build plugin binary
 make test       # Run unit tests
-make lint       # Run linter (requires golangci-lint)
-make install    # Build + install locally for testing
+make lint       # Run linter
+make install    # Build + install locally
 ```
 
 ### Local Testing
 
 ```bash
-# Install plugin and schemas locally
+# Install plugin locally
 make install
 
-# Start formae agent (discovers the plugin)
+# Start formae agent
 formae agent start
 
 # Apply example resources
 formae apply examples/basic/main.pkl
 ```
 
-### Conformance Testing
+### Credentials Setup
 
-Run the full conformance test suite (CRUD lifecycle + discovery) against a specific formae version:
+The `scripts/ci/setup-credentials.sh` script is used for **local development** to verify your cloud credentials are configured correctly before running conformance tests.
 
 ```bash
-# Run conformance tests with latest stable version
+# Verify credentials are configured
+./scripts/ci/setup-credentials.sh
+
+# Run conformance tests (calls setup-credentials automatically)
 make conformance-test
-
-# Run conformance tests with a specific version
-make conformance-test VERSION=0.77.0
 ```
 
-The conformance tests:
-1. Call `setup-credentials` to provision cloud credentials
-2. Call `clean-environment` to remove orphaned resources from previous runs
-3. Build and install the plugin locally
-4. Download the specified formae version (defaults to latest)
-5. Run CRUD lifecycle tests for each resource type
-6. Run discovery tests to verify resource detection
-7. Call `clean-environment` to clean up test resources
+**For CI/CD**, configure credentials differently using GitHub secrets or OIDC. See `.github/workflows/ci.yml` for examples with AWS, Azure, GCP, and OpenStack.
 
-### CI Hooks
+### Conformance Testing
 
-The template includes hook scripts that you customize for your cloud provider:
+Run the full CRUD lifecycle + discovery tests:
 
-#### `scripts/ci/setup-credentials.sh`
-
-Provisions credentials for your cloud provider. Called before running conformance tests.
-
-**Examples:**
-- AWS: Verify `AWS_ACCESS_KEY_ID` is set or use OIDC
-- OpenStack: Source your RC file and verify required env vars
-- Azure: Run `az login` or verify OIDC credentials
-- GCP: Run `gcloud auth` or verify workload identity
-
-#### `scripts/ci/clean-environment.sh`
-
-Cleans up test resources in your cloud environment. Called before AND after conformance tests to:
-- Remove orphaned resources from previous failed runs (pre-cleanup)
-- Clean up resources created during the test run (post-cleanup)
-
-The script should be idempotent and delete all resources under the /testdata folder
-
-#### GitHub Actions
-
-The `.github/workflows/ci.yml` workflow includes a `conformance-tests` job that is
-disabled by default. To enable it:
-
-1. Configure credentials for your cloud provider in the workflow
-2. Implement the hook scripts for local verification
-3. Set `run_conformance` to `true` when triggering the workflow, or modify the `if` condition
-
-See the workflow file for credential configuration examples for AWS, Azure, GCP, and OpenStack.
-
-## Defining Resources (Pkl)
-
-Create resource classes in `schema/pkl/`:
-
-```pkl
-@formae.ResourceHint {
-    type = "MYPROVIDER::Service::Resource"
-    identifier = "$.Id"
-}
-class MyResource extends formae.Resource {
-    @formae.FieldHint {}
-    name: String
-
-    @formae.FieldHint { createOnly = true }
-    region: String?
-}
+```bash
+make conformance-test                  # Latest formae version
+make conformance-test VERSION=0.77.0   # Specific version
 ```
 
-## Plugin Manifest
-
-All plugin metadata lives in `formae-plugin.pkl`:
-
-```pkl
-amends "@formae/plugin-manifest.pkl"
-
-name = "myprovider"           # Plugin identifier
-version = "1.0.0"             # Semantic version
-description = "My cloud provider plugin"
-
-spec {
-    protocolVersion = 1       # SDK protocol version
-    namespace = "MYPROVIDER"  # Resource type prefix
-    capabilities { "create"; "read"; "update"; "delete"; "list"; "discovery" }
-}
-```
-
-## Async (long-running) Operations
-
-All plugin operations return the `ProgressResult` struct. For async (long-running) operations
-return `InProgress` with a `RequestID`. The formae agent will call the `Status` method on
-a regular interval to request the status of the operation.
-
-```go
-func (p *Plugin) Create(ctx context.Context, req *resource.CreateRequest) (*resource.CreateResult, error) {
-    operationID := startAsyncCreate(...)
-
-    return &resource.CreateResult{
-        ProgressResult: &resource.ProgressResult{
-            Operation:       resource.OperationCreate,
-            OperationStatus: resource.OperationStatusInProgress,
-            RequestID:       operationID,
-        },
-    }, nil
-}
-
-func (p *Plugin) Status(ctx context.Context, req *resource.StatusRequest) (*resource.StatusResult, error) {
-    status := checkOperation(req.RequestID)
-    if status.Complete {
-        return &resource.StatusResult{
-            ProgressResult: &resource.ProgressResult{
-                OperationStatus: resource.OperationStatusSuccess,
-                NativeID:        status.ResourceID,
-            },
-        }, nil
-    }
-    // Still in progress - return InProgress status
-}
-```
+The `scripts/ci/clean-environment.sh` script cleans up test resources. It runs before and after conformance tests and should be idempotent.
 
 ## License
 
-This template is licensed under FSL-1.1-ALv2 - See [LICENSE](LICENSE)
-
-When creating your own plugin, choose an appropriate license for your project.
-Common choices include:
-- **MIT** - Most permissive
-- **Apache-2.0** - Permissive with patent grant (recommended)
-- **MPL-2.0** - Weak copyleft
-- **FSL-1.1-ALv2** - Functional Source License
-
-Replace the LICENSE file with your chosen license when you create your plugin.
+<!-- TODO: Update with your chosen license -->
+This plugin is licensed under Apache-2.0 - See [LICENSE](LICENSE)

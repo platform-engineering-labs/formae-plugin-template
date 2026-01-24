@@ -12,33 +12,62 @@ module example
 
 import "@formae/formae.pkl"
 
+// =============================================================================
+// Tag - Plain class example
+// =============================================================================
+// Use a plain class (not SubResource) when:
+// - The structure is simple and universal (like key-value pairs)
+// - You manually define output with hidden/fixed pattern
+// - No FieldHints needed
+//
+// Use SubResource when:
+// - The nested object has multiple configurable fields
+// - Fields need FieldHint annotations (createOnly, entitySet, etc.)
+// - You want automatic output transformation via props()/render()
+
+/// Tag for resource identification and organization.
+open class Tag {
+    hidden key: String
+    hidden value: String
+
+    fixed Key: String = key
+    fixed Value: String = value
+}
+
+// =============================================================================
+// Endpoint - SubResource example
+// =============================================================================
+// SubResource provides props() and render() methods for automatic output
+// transformation, and integrates with the schema system for field hints.
+
+/// Network endpoint configuration.
+@formae.SubResourceHint {}
+class Endpoint extends formae.SubResource {
+    /// The endpoint URL
+    @formae.FieldHint {}
+    url: String
+
+    /// The port number
+    @formae.FieldHint {}
+    port: Int = 443
+
+    /// The protocol (http or https)
+    @formae.FieldHint {}
+    protocol: String = "https"
+}
+
+// =============================================================================
+// ExampleResource - Main resource definition
+// =============================================================================
+
 /// ExampleResource demonstrates the structure of a Formae resource.
 /// TODO: Replace with your actual resource definitions.
 @formae.ResourceHint {
-    // Resource type in format: NAMESPACE::SERVICE::RESOURCE
     type = "EXAMPLE::Service::Resource"
-
-    // JSONPath to the resource's unique identifier in the API response
     identifier = "$.Id"
-
-    // Optional: Parent resource type for nested resources
-    // parent = "EXAMPLE::Service::ParentResource"
-
-    // Optional: Set to true if resource cannot be provisioned via API
-    // nonprovisionable = false
-
-    // Optional: Set to false to exclude from discovery
-    // discoverable = true
-
-    // Optional: Set to false to exclude from extraction
-    // extractable = true
 }
 class ExampleResource extends formae.Resource {
-    // The 'type' is set from the ResourceHint annotation
     fixed hidden type: String = "EXAMPLE::Service::Resource"
-
-    // Define your resource properties below
-    // Use @formae.FieldHint annotations for special handling
 
     /// The display name of the resource
     @formae.FieldHint {}
@@ -48,20 +77,20 @@ class ExampleResource extends formae.Resource {
     @formae.FieldHint {}
     description: String?
 
-    /// Example of a create-only property (cannot be changed after creation)
+    /// Region cannot be changed after creation (triggers replacement)
     @formae.FieldHint { createOnly = true }
-    immutableSetting: String?
+    region: String?
 
-    /// Example of a nested configuration
+    /// Network endpoint configuration (SubResource example)
     @formae.FieldHint {}
-    config: ResourceConfig?
-}
+    endpoint: Endpoint?
 
-/// Nested configuration class
-class ResourceConfig extends formae.SubResource {
-    @formae.FieldHint {}
-    enabled: Boolean = true
-
-    @formae.FieldHint {}
-    maxItems: Int = 100
+    /// Resource tags for identification and organization.
+    /// Uses EntitySet semantics: items are matched by Key for updates.
+    /// See: https://docs.formae.io/plugin-sdk/collection-semantics
+    @formae.FieldHint {
+        updateMethod = "EntitySet"
+        indexField = "Key"
+    }
+    tags: Listing<Tag>?
 }

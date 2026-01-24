@@ -30,9 +30,17 @@ forma {
     label = "my-resource"
     name = "My Example Resource"
     description = "This is an example resource"
-    config = new example.ResourceConfig {
-      enabled = true
-      maxItems = 50
+    region = "us-east-1"
+
+    endpoint = new example.Endpoint {
+      url = "https://api.example.com"
+      port = 8080
+      protocol = "https"
+    }
+
+    tags = new Listing {
+      new example.Tag { key = "Environment"; value = "development" }
+      new example.Tag { key = "Team"; value = "platform" }
     }
   }
 }
