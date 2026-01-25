@@ -22,7 +22,7 @@ BINARY := $(PLUGIN_NAME)
 PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
 INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)/v$(PLUGIN_VERSION)
 
-.PHONY: all build test test-unit test-integration lint clean install help setup-credentials clean-environment conformance-test
+.PHONY: all build test test-unit test-integration lint clean install help clean-environment conformance-test
 
 all: build
 
@@ -71,11 +71,6 @@ help:
 	@echo "Available targets:"
 	@grep -E '^## ' $(MAKEFILE_LIST) | sed 's/## /  /'
 
-## setup-credentials: Provision cloud provider credentials
-## Edit scripts/ci/setup-credentials.sh to configure for your provider.
-setup-credentials:
-	@./scripts/ci/setup-credentials.sh
-
 ## clean-environment: Clean up test resources in cloud environment
 ## Called before and after conformance tests. Edit scripts/ci/clean-environment.sh
 ## to configure for your provider.
@@ -83,10 +78,10 @@ clean-environment:
 	@./scripts/ci/clean-environment.sh
 
 ## conformance-test: Run conformance tests against formae
-## Usage: make conformance-test [VERSION=0.76.0]
+## Usage: make conformance-test [VERSION=0.80.0]
 ## Downloads the specified formae version (or latest) and runs conformance tests.
-## Calls setup-credentials and clean-environment automatically.
-conformance-test: install setup-credentials
+## Calls clean-environment before and after tests.
+conformance-test: install
 	@echo "Pre-test cleanup..."
 	@./scripts/ci/clean-environment.sh || true
 	@echo ""

@@ -99,20 +99,6 @@ formae agent start
 formae apply --mode reconcile --watch examples/basic/main.pkl
 ```
 
-### Credentials Setup
-
-The `scripts/ci/setup-credentials.sh` script is used for **local development** to verify your cloud credentials are configured correctly before running conformance tests.
-
-```bash
-# Verify credentials are configured
-./scripts/ci/setup-credentials.sh
-
-# Run conformance tests (calls setup-credentials automatically)
-make conformance-test
-```
-
-**For CI/CD**, configure credentials differently using GitHub secrets or OIDC. See `.github/workflows/ci.yml` for examples with AWS, Azure, GCP, and OpenStack.
-
 ### Conformance Testing
 
 Run the full CRUD lifecycle + discovery tests:
