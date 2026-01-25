@@ -18,9 +18,9 @@ GOFLAGS := -trimpath
 BINARY := $(PLUGIN_NAME)
 
 # Installation paths
-# NOTE: Directory structure will change from <namespace> to <name> in a future version
+# Plugin discovery expects lowercase directory names matching the plugin name
 PLUGIN_BASE_DIR := $(HOME)/.pel/formae/plugins
-INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)/v$(PLUGIN_VERSION)
+INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAME)/v$(PLUGIN_VERSION)
 
 .PHONY: all build test test-unit test-integration lint clean install help clean-environment conformance-test
 
@@ -52,11 +52,11 @@ clean:
 	rm -rf bin/ dist/
 
 ## install: Build and install plugin locally (binary + schema + manifest)
-## Installs to ~/.pel/formae/plugins/<namespace>/v<version>/
+## Installs to ~/.pel/formae/plugins/<name>/v<version>/
 ## Removes any existing versions of the plugin first to ensure clean state.
 install: build
 	@echo "Installing $(PLUGIN_NAME) v$(PLUGIN_VERSION) (namespace: $(PLUGIN_NAMESPACE))..."
-	@rm -rf $(PLUGIN_BASE_DIR)/$(PLUGIN_NAMESPACE)
+	@rm -rf $(PLUGIN_BASE_DIR)/$(PLUGIN_NAME)
 	@mkdir -p $(INSTALL_DIR)/schema/pkl
 	@cp bin/$(BINARY) $(INSTALL_DIR)/$(BINARY)
 	@cp -r schema/pkl/* $(INSTALL_DIR)/schema/pkl/
