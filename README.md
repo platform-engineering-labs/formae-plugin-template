@@ -9,6 +9,7 @@ After creating your plugin with `formae plugin init`, complete these steps:
 - [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, description)
 - [ ] Define your resource types in `schema/pkl/*.pkl`
 - [ ] Implement CRUD operations in `plugin.go`
+- [ ] Update test fixtures in `testdata/*.pkl` to use your resources
 - [ ] Update this README (see below - replace title, description, resources, etc.)
 - [ ] Set up local credentials for testing (see Development section)
 - [ ] Run conformance tests locally: `make conformance-test`
@@ -101,7 +102,15 @@ formae apply --mode reconcile --watch examples/basic/main.pkl
 
 ### Conformance Testing
 
-Run the full CRUD lifecycle + discovery tests:
+Conformance tests validate your plugin's CRUD lifecycle using the test fixtures in `testdata/`:
+
+| File | Purpose |
+|------|---------|
+| `resource.pkl` | Initial resource creation |
+| `resource-update.pkl` | In-place update (mutable fields) |
+| `resource-replace.pkl` | Replacement (createOnly fields) |
+
+The test harness sets `FORMAE_TEST_RUN_ID` for unique resource naming between runs.
 
 ```bash
 make conformance-test                  # Latest formae version
