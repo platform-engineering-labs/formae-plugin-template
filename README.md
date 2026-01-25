@@ -119,6 +119,9 @@ make conformance-test VERSION=0.80.0   # Specific version
 
 The `scripts/ci/clean-environment.sh` script cleans up test resources. It runs before and after conformance tests and should be idempotent.
 
-## License
+## Licensing
 
-This plugin is licensed under [Apache-2.0](LICENSE). <!-- TODO: Update with your chosen license -->
+Plugins are independent works and may be licensed under any license of the author’s choosing.
+
+See the formae plugin policy:
+<https://docs.formae.io/plugin-sdk/
