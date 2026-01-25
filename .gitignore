@@ -27,3 +27,4 @@ dist/
 # Pkl
 .pkl-cache/
 *.pkl-expected.pcf
+PklProject.deps.json
