@@ -20,7 +20,7 @@ make install            # Build + install to ~/.pel/formae/plugins/<namespace>/v
 
 # Conformance testing (CRUD lifecycle + discovery)
 make conformance-test                  # Latest formae version
-make conformance-test VERSION=0.77.0   # Specific version
+make conformance-test VERSION=0.77.16-internal   # Specific version
 ```
 
 ## Architecture
