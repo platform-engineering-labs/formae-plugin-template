@@ -3,8 +3,8 @@ module github.com/your-org/formae-plugin-example
 go 1.25
 
 require (
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.2
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.5
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.3
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.6
 )
 
 require (
