@@ -4,6 +4,15 @@
 
 ## Getting Started
 
+> **⚠️ Do not clone this repository directly!**
+>
+> Use `formae plugin init` to create your plugin. This command scaffolds a new
+> plugin from this template with proper naming and configuration.
+>
+> ```bash
+> formae plugin init my-plugin
+> ```
+
 After creating your plugin with `formae plugin init`, complete these steps:
 
 - [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, description)
