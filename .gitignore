@@ -28,3 +28,7 @@ dist/
 .pkl-cache/
 *.pkl-expected.pcf
 PklProject.deps.json
+
+# Claude Code
+CLAUDE.md
+.claude/

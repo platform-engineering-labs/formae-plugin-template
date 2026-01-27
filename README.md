@@ -1,9 +1,3 @@
-<!-- ============================================================================
-     TEMPLATE CHECKLIST - Remove this entire block after completing setup
-     ============================================================================
-
-## Getting Started
-
 > **⚠️ Do not clone this repository directly!**
 >
 > Use `formae plugin init` to create your plugin. This command scaffolds a new
@@ -13,27 +7,31 @@
 > formae plugin init my-plugin
 > ```
 
+---
+
+## Setup Checklist
+
+*Remove this section and the warning above after completing setup.*
+
 After creating your plugin with `formae plugin init`, complete these steps:
 
 - [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, description)
 - [ ] Define your resource types in `schema/pkl/*.pkl`
 - [ ] Implement CRUD operations in `plugin.go`
 - [ ] Update test fixtures in `testdata/*.pkl` to use your resources
-- [ ] Update this README (see below - replace title, description, resources, etc.)
-- [ ] Set up local credentials for testing (see Development section)
+- [ ] Update this README (replace title, description, resources table, etc.)
+- [ ] Set up local credentials for testing
 - [ ] Run conformance tests locally: `make conformance-test`
 - [ ] Configure CI credentials in `.github/workflows/ci.yml` (optional)
-- [ ] Remove this "Getting Started" checklist section
+- [ ] Remove this checklist section and the warning box above
 
 For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io/plugin-sdk).
 
-     ============================================================================
-     END TEMPLATE CHECKLIST - Everything below is YOUR plugin's README
-     ============================================================================ -->
+---
 
 # Example Plugin for Formae
 
-<!-- TODO: Update title and description for your plugin -->
+*TODO: Update title and description for your plugin*
 
 Example Formae plugin template - replace this with a description of what your plugin manages.
 
@@ -46,7 +44,7 @@ make install
 
 ## Supported Resources
 
-<!-- TODO: Document your supported resource types -->
+*TODO: Document your supported resource types*
 
 | Resource Type | Description |
 |---------------|-------------|
