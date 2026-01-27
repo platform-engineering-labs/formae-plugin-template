@@ -29,7 +29,7 @@ For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io
 
 ---
 
-# Example Plugin for Formae
+# Example Plugin for formae
 
 *TODO: Update title and description for your plugin*
 
