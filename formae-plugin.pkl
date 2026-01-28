@@ -1,0 +1,29 @@
+/*
+ * Formae Plugin Manifest
+ *
+ * This file defines metadata for your Formae plugin.
+ * Update the values below to match your plugin.
+ */
+
+// TODO: Change to your plugin name (lowercase, letters/numbers/hyphens)
+name = "example"
+
+// TODO: Update version following semver
+version = "0.1.0"
+
+// TODO: Resource type namespace prefix (uppercase)
+// This appears in resource types: EXAMPLE::Service::Resource
+namespace = "EXAMPLE"
+
+// TODO: Describe what your plugin does
+description = "Example Formae plugin template"
+
+// TODO: Your license (SPDX identifier)
+license = "Apache-2.0"
+
+// TODO: Minimum formae version required
+minFormaeVersion = "0.80.0"
+
+output {
+  renderer = new JsonRenderer {}
+}
