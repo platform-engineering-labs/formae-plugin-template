@@ -3,8 +3,8 @@ module github.com/your-org/formae-plugin-example
 go 1.25
 
 require (
-	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.5
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.6
+	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.7
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.8
 )
 
 require (
@@ -19,7 +19,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3 // indirect
 	github.com/masterminds/semver v1.5.0 // indirect
 	github.com/platform-engineering-labs/formae/pkg/api/model v0.1.1 // indirect
-	github.com/platform-engineering-labs/formae/pkg/model v0.1.1 // indirect
+	github.com/platform-engineering-labs/formae/pkg/model v0.1.2 // indirect
 	github.com/theory/jsonpath v0.10.2 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
