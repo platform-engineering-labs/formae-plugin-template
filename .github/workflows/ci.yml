@@ -75,6 +75,25 @@ jobs:
           pkl eval formae-plugin.pkl --format json > /dev/null
           echo "Manifest validated successfully"
 
+  verify-schema:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Set up Pkl
+        uses: pkl-community/setup-pkl@v0
+        with:
+          pkl-version: 0.30.0
+
+      - name: Verify schema
+        run: make verify-schema
+
   # Integration tests run against real infrastructure.
   # This job is disabled by default - enable it after configuring credentials.
   integration-tests:
@@ -113,7 +132,7 @@ jobs:
   # 3. Implement scripts/ci/clean-environment.sh for test resource cleanup
   # 4. Change the 'if' condition to enable the job
   conformance-tests:
-    needs: [build, lint, pkl-validate]
+    needs: [build, lint, pkl-validate, verify-schema]
     runs-on: ubuntu-latest
     # Disabled by default - change condition after configuring credentials:
     # if: github.event_name == 'schedule' || github.event_name == 'push' || github.event.inputs.run_conformance == 'true'
