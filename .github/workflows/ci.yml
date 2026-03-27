@@ -208,6 +208,7 @@ jobs:
       - name: Run conformance tests
         env:
           FORMAE_TEST_RUN_ID: ${{ github.run_id }}-${{ github.run_attempt }}
+          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
         run: |
           # Use input version if provided, otherwise use matrix version
           VERSION="${{ inputs.formae_version }}"
