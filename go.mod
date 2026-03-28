@@ -4,7 +4,7 @@ go 1.25
 
 require (
 	github.com/platform-engineering-labs/formae/pkg/plugin v0.1.19
-	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.33
+	github.com/platform-engineering-labs/formae/pkg/plugin-conformance-tests v0.1.34
 )
 
 require (
