@@ -1,0 +1,19 @@
+/*
+ * © 2025 Your Name
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/// Plugin configuration.
+/// Customize this with plugin-specific settings that users can set in formae.conf.pkl.
+open module example.Config
+
+extends "formae:/Config.pkl"
+
+class PluginConfig extends BaseResourcePluginConfig {
+    type = "example"  // TODO: Replace with your plugin name
+
+    // Add custom configuration fields here, e.g.:
+    // defaultRegion: String = "us-east-1"
+    // maxRetries: Int = 3
+}

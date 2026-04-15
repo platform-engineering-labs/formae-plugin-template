@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/platform-engineering-labs/formae/pkg/model"
 	"github.com/platform-engineering-labs/formae/pkg/plugin"
 	"github.com/platform-engineering-labs/formae/pkg/plugin/resource"
 )
@@ -29,9 +30,9 @@ var _ plugin.ResourcePlugin = &Plugin{}
 
 // RateLimit returns the rate limiting configuration for this plugin.
 // Adjust MaxRequestsPerSecondForNamespace based on your provider's API limits.
-func (p *Plugin) RateLimit() plugin.RateLimitConfig {
-	return plugin.RateLimitConfig{
-		Scope:                            plugin.RateLimitScopeNamespace,
+func (p *Plugin) RateLimit() model.RateLimitConfig {
+	return model.RateLimitConfig{
+		Scope:                            model.RateLimitScopeNamespace,
 		MaxRequestsPerSecondForNamespace: 10, // TODO: Adjust based on provider limits
 	}
 }
@@ -39,12 +40,12 @@ func (p *Plugin) RateLimit() plugin.RateLimitConfig {
 // DiscoveryFilters returns filters to exclude certain resources from discovery.
 // Resources matching ALL conditions in a filter are excluded.
 // Return nil if you want to discover all resources.
-func (p *Plugin) DiscoveryFilters() []plugin.MatchFilter {
+func (p *Plugin) DiscoveryFilters() []model.MatchFilter {
 	// Example: exclude resources with a specific tag
-	// return []plugin.MatchFilter{
+	// return []model.MatchFilter{
 	//     {
 	//         ResourceTypes: []string{"EXAMPLE::Service::Resource"},
-	//         Conditions: []plugin.FilterCondition{
+	//         Conditions: []model.FilterCondition{
 	//             {PropertyPath: "$.Tags[?(@.Key=='skip-discovery')].Value", PropertyValue: "true"},
 	//         },
 	//     },
@@ -54,8 +55,8 @@ func (p *Plugin) DiscoveryFilters() []plugin.MatchFilter {
 
 // LabelConfig returns the configuration for extracting human-readable labels
 // from discovered resources.
-func (p *Plugin) LabelConfig() plugin.LabelConfig {
-	return plugin.LabelConfig{
+func (p *Plugin) LabelConfig() model.LabelConfig {
+	return model.LabelConfig{
 		// Default JSONPath query to extract label from resources
 		// Example for tagged resources: $.Tags[?(@.Key=='Name')].Value
 		DefaultQuery: "$.Name", // TODO: Adjust for your provider
