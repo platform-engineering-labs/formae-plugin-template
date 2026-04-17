@@ -6,6 +6,17 @@
 
 /// Plugin configuration.
 /// Customize this with plugin-specific settings that users can set in formae.conf.pkl.
+///
+/// Users import this via: import "plugins:/<PluginName>.pkl" as <PluginName>
+///
+/// Then use it in their formae.conf.pkl:
+///   agent {
+///       resourcePlugins {
+///           new <PluginName>.PluginConfig {
+///               rateLimit { maxRequestsPerSecond = 5 }
+///           }
+///       }
+///   }
 open module example.Config
 
 extends "formae:/Config.pkl"
