@@ -26,9 +26,18 @@ INSTALL_DIR := $(PLUGIN_BASE_DIR)/$(PLUGIN_NAME)/v$(PLUGIN_VERSION)
 
 all: build
 
-## build: Build the plugin binary
+## build: Build the plugin binary and update manifest
 build:
 	$(GO) build $(GOFLAGS) -o bin/$(BINARY) .
+	@MIN_VERSION=$$($(GO) list -m -f '{{.Dir}}' github.com/platform-engineering-labs/formae/pkg/plugin 2>/dev/null | xargs -I{} grep 'MinFormaeVersion' {}/version.go 2>/dev/null | grep -oE '"[0-9]+\.[0-9]+\.[0-9]+"' | tr -d '"'); \
+	if [ -n "$$MIN_VERSION" ]; then \
+		echo "Updating minFormaeVersion to $$MIN_VERSION"; \
+		if [ "$$(uname)" = "Darwin" ]; then \
+			sed -i '' 's/^minFormaeVersion = .*/minFormaeVersion = "'"$$MIN_VERSION"'"/' formae-plugin.pkl; \
+		else \
+			sed -i 's/^minFormaeVersion = .*/minFormaeVersion = "'"$$MIN_VERSION"'"/' formae-plugin.pkl; \
+		fi; \
+	fi
 
 ## test: Run all tests
 test:
@@ -62,13 +71,13 @@ clean:
 install: build
 	@echo "Installing $(PLUGIN_NAME) v$(PLUGIN_VERSION) (namespace: $(PLUGIN_NAMESPACE))..."
 	@rm -rf $(PLUGIN_BASE_DIR)/$(PLUGIN_NAME)
-	@mkdir -p $(INSTALL_DIR)/schema/pkl
+	@mkdir -p $(INSTALL_DIR)/schema
 	@cp bin/$(BINARY) $(INSTALL_DIR)/$(BINARY)
-	@cp -r schema/pkl/* $(INSTALL_DIR)/schema/pkl/
+	@cp -r schema/* $(INSTALL_DIR)/schema/
 	@cp formae-plugin.pkl $(INSTALL_DIR)/
 	@echo "Installed to $(INSTALL_DIR)"
 	@echo "  - Binary: $(INSTALL_DIR)/$(BINARY)"
-	@echo "  - Schema: $(INSTALL_DIR)/schema/pkl/"
+	@echo "  - Schema: $(INSTALL_DIR)/schema/"
 	@echo "  - Manifest: $(INSTALL_DIR)/formae-plugin.pkl"
 
 ## help: Show this help message
@@ -83,24 +92,19 @@ clean-environment:
 	@./scripts/ci/clean-environment.sh
 
 ## conformance-test: Run all conformance tests (CRUD + discovery)
-## Usage: make conformance-test [VERSION=0.80.0] [TEST=s3-bucket] [TIMEOUT=15]
-## Downloads the specified formae version (or latest) and runs conformance tests.
+## Usage: make conformance-test [TEST=s3-bucket] [TIMEOUT=30m]
 ## Calls clean-environment before and after tests.
-##
-## Parameters:
-##   VERSION - Formae version to test against (default: latest)
-##   TEST    - Filter tests by name pattern (e.g., TEST=s3-bucket)
-##   TIMEOUT - Timeout in minutes for long-running operations (default: 5)
 conformance-test: conformance-test-crud conformance-test-discovery
 
 ## conformance-test-crud: Run only CRUD lifecycle tests
-## Usage: make conformance-test-crud [VERSION=0.80.0] [TEST=s3-bucket] [TIMEOUT=15]
+## Usage: make conformance-test-crud [TEST=s3-bucket] [TIMEOUT=30m]
 conformance-test-crud: install
 	@echo "Pre-test cleanup..."
 	@./scripts/ci/clean-environment.sh || true
 	@echo ""
 	@echo "Running CRUD conformance tests..."
-	@FORMAE_TEST_FILTER="$(TEST)" FORMAE_TEST_TYPE=crud FORMAE_TEST_TIMEOUT="$(TIMEOUT)" ./scripts/run-conformance-tests.sh $(VERSION); \
+	@FORMAE_TEST_FILTER="$(TEST)" FORMAE_TEST_TYPE=crud \
+		$(GO) test -tags=conformance -v -timeout $(or $(TIMEOUT),30m) ./...; \
 	TEST_EXIT=$$?; \
 	echo ""; \
 	echo "Post-test cleanup..."; \
@@ -108,13 +112,14 @@ conformance-test-crud: install
 	exit $$TEST_EXIT
 
 ## conformance-test-discovery: Run only discovery tests
-## Usage: make conformance-test-discovery [VERSION=0.80.0] [TEST=s3-bucket] [TIMEOUT=15]
+## Usage: make conformance-test-discovery [TEST=s3-bucket] [TIMEOUT=30m]
 conformance-test-discovery: install
 	@echo "Pre-test cleanup..."
 	@./scripts/ci/clean-environment.sh || true
 	@echo ""
 	@echo "Running discovery conformance tests..."
-	@FORMAE_TEST_FILTER="$(TEST)" FORMAE_TEST_TYPE=discovery FORMAE_TEST_TIMEOUT="$(TIMEOUT)" ./scripts/run-conformance-tests.sh $(VERSION); \
+	@FORMAE_TEST_FILTER="$(TEST)" FORMAE_TEST_TYPE=discovery \
+		$(GO) test -tags=conformance -v -timeout $(or $(TIMEOUT),30m) ./...; \
 	TEST_EXIT=$$?; \
 	echo ""; \
 	echo "Post-test cleanup..."; \
