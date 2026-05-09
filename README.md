@@ -15,11 +15,18 @@
 
 After creating your plugin with `formae plugin init`, complete these steps:
 
-- [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, summary, category, description)
+- [ ] Update `formae-plugin.pkl` with your plugin metadata (name, namespace, summary, category, description, license)
+- [ ] Choose your license. **The formae Hub only accepts plugins licensed
+      under one of: `Apache-2.0`, `BSD-3-Clause`, `MIT`, or `MPL-2.0`.**
+      Pick one of these if you intend to publish to the Hub. Copy the
+      matching file from `licenses/` to `LICENSE`, then set the `license`
+      field in `formae-plugin.pkl` to the same SPDX identifier.
 - [ ] Define your resource types in `schema/pkl/*.pkl`
 - [ ] Implement CRUD operations in `plugin.go`
 - [ ] Update test fixtures in `testdata/*.pkl` to use your resources
 - [ ] Update this README (replace title, description, resources table, etc.)
+- [ ] Update [CONTRIBUTING.md](CONTRIBUTING.md) if your local dev steps
+      differ from the template's defaults
 - [ ] Set up local credentials for testing
 - [ ] Run conformance tests locally: `make conformance-test`
 - [ ] Configure CI credentials in `.github/workflows/ci.yml` (optional)
@@ -29,6 +36,9 @@ After creating your plugin with `formae plugin init`, complete these steps:
 
 For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io/plugin-sdk).
 
+For local development workflow (building, testing, conformance), see
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
 ---
 
 # Example Plugin for formae
@@ -36,13 +46,6 @@ For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io
 *TODO: Update title and description for your plugin*
 
 Example Formae plugin template - replace this with a description of what your plugin manages.
-
-## Installation
-
-```bash
-# Install the plugin
-make install
-```
 
 ## Supported Resources
 
@@ -79,58 +82,11 @@ formae eval examples/basic/main.pkl
 formae apply --mode reconcile --watch examples/basic/main.pkl
 ```
 
-## Development
-
-### Prerequisites
-
-- Go 1.25+
-- [Pkl CLI](https://pkl-lang.org/main/current/pkl-cli/index.html)
-- Cloud provider credentials (for conformance testing)
-
-### Building
-
-```bash
-make build      # Build plugin binary
-make test       # Run unit tests
-make lint       # Run linter
-make install    # Build + install locally
-```
-
-### Local Testing
-
-```bash
-# Install plugin locally
-make install
-
-# Start formae agent
-formae agent start
-
-# Apply example resources
-formae apply --mode reconcile --watch examples/basic/main.pkl
-```
-
-### Conformance Testing
-
-Conformance tests validate your plugin's CRUD lifecycle using the test fixtures in `testdata/`:
-
-| File | Purpose |
-|------|---------|
-| `resource.pkl` | Initial resource creation |
-| `resource-update.pkl` | In-place update (mutable fields) |
-| `resource-replace.pkl` | Replacement (createOnly fields) |
-
-The test harness sets `FORMAE_TEST_RUN_ID` for unique resource naming between runs.
-
-```bash
-make conformance-test                  # Latest formae version
-make conformance-test VERSION=0.80.0   # Specific version
-```
-
-The `scripts/ci/clean-environment.sh` script cleans up test resources. It runs before and after conformance tests and should be idempotent.
-
 ## Licensing
 
-Plugins are independent works and may be licensed under any license of the author’s choosing.
+The formae Hub accepts plugins under one of: **Apache-2.0**, **BSD-3-Clause**,
+**MIT**, or **MPL-2.0**. Plugins under any other license can still be built
+and used locally, but cannot be published to the Hub.
 
 See the formae plugin policy:
-<https://docs.formae.io/plugin-sdk/
+<https://docs.formae.io/plugin-sdk/>
