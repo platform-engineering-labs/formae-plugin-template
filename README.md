@@ -30,8 +30,9 @@ After creating your plugin with `formae plugin init`, complete these steps:
 - [ ] Set up local credentials for testing
 - [ ] Run conformance tests locally: `make conformance-test`
 - [ ] Configure CI credentials in `.github/workflows/ci.yml` (optional)
-- [ ] Replace `<your-plugin-name>` in `.github/workflows/release.yml` with your plugin's `name` field
-- [ ] Add `HUB_DISPATCH_PAT` as a repo secret (provided by PEL admin) to enable releases
+- [ ] Register the plugin on the formae Hub (the Hub installs its
+      GitHub App on your repo, and tag pushes from then on dispatch
+      builds via the Hub — no per-repo release workflow needed)
 - [ ] Remove this checklist section and the warning box above
 
 For detailed guidance, see the [Plugin SDK Documentation](https://docs.formae.io/plugin-sdk).
