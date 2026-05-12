@@ -15,8 +15,15 @@ version = "0.1.0"
 // This appears in resource types: EXAMPLE::Service::Resource
 namespace = "EXAMPLE"
 
+// TODO: One-line summary shown in `formae plugin list/info` output
+summary = "Example Formae plugin template"
+
 // TODO: Describe what your plugin does
 description = "Example Formae plugin template"
+
+// TODO: Category for the plugin directory listing.
+// Common values: "cloud", "network", "config", "observability", "auth", "other"
+category = "other"
 
 // TODO: Your license (SPDX identifier)
 license = "Apache-2.0"
