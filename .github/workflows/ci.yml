@@ -35,7 +35,7 @@ jobs:
       - name: Set up Pkl
         uses: pkl-community/setup-pkl@v0
         with:
-          pkl-version: 0.30.0
+          pkl-version: 0.31.0
 
       - name: Build
         run: make build
@@ -68,7 +68,7 @@ jobs:
       - name: Set up Pkl
         uses: pkl-community/setup-pkl@v0
         with:
-          pkl-version: 0.30.0
+          pkl-version: 0.31.0
 
       - name: Validate Pkl schemas
         run: |
@@ -89,7 +89,7 @@ jobs:
       - name: Set up Pkl
         uses: pkl-community/setup-pkl@v0
         with:
-          pkl-version: 0.30.0
+          pkl-version: 0.31.0
 
       - name: Verify schema
         run: make verify-schema
@@ -113,7 +113,7 @@ jobs:
       - name: Set up Pkl
         uses: pkl-community/setup-pkl@v0
         with:
-          pkl-version: 0.30.0
+          pkl-version: 0.31.0
 
       # Configure credentials for your infrastructure here
       # Example:
@@ -163,7 +163,7 @@ jobs:
       - name: Set up Pkl
         uses: pkl-community/setup-pkl@v0
         with:
-          pkl-version: 0.30.0
+          pkl-version: 0.31.0
 
       # =================================================================
       # CREDENTIAL SETUP - Uncomment and configure for your provider
