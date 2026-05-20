@@ -7,7 +7,7 @@
 amends "@formae/forma.pkl"
 
 import "@formae/formae.pkl"
-import "@example/example.pkl"
+import "@example/core/example.pkl"
 
 forma {
   new formae.Stack {

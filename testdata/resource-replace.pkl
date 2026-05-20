@@ -11,7 +11,7 @@
 amends "@formae/forma.pkl"
 import "@formae/formae.pkl"
 
-import "@example/example.pkl"
+import "@example/core/example.pkl"
 
 local stackName = "plugin-sdk-test-stack"
 local testRunID = read("env:FORMAE_TEST_RUN_ID")
