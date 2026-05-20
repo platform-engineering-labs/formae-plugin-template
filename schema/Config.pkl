@@ -22,7 +22,7 @@ open module example.Config
 extends "formae:/Config.pkl"
 
 class PluginConfig extends BaseResourcePluginConfig {
-    type = "example"  // TODO: Replace with your plugin name
+    type = "example"  // Plugin name used by formae to identify this plugin.
 
     // Add custom configuration fields here, e.g.:
     // defaultRegion: String = "us-east-1"
