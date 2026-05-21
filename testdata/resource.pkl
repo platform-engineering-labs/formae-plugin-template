@@ -7,7 +7,7 @@
 amends "@formae/forma.pkl"
 import "@formae/formae.pkl"
 
-import "@example/example.pkl"
+import "@example/core/example.pkl"
 
 local stackName = "plugin-sdk-test-stack"
 // Read the test run ID from environment variable set by the test harness
